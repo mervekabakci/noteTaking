@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import AuthContext from "../context/AuthContext"
 
 export default function AuthBox(){
-    const { handleLogin, handleRegister, handleForgot, handleReset } = useContext(AuthContext);
+    const { handleLogin, handleRegister, handleForgot, handleReset, loading, dialog, setDialog } = useContext(AuthContext);
     const [mode, setMode] = useState("login");
 
     function handleSubmit(e){
@@ -14,6 +14,19 @@ export default function AuthBox(){
     
     return(
         <div className="authContainer">
+            {loading && <div className="loading">Loading ...</div>}
+
+            {dialog && (
+                <dialog open>
+                    <div>uyarı icon</div>
+                    <p>{dialog}</p>
+                    <button onClick={() => 
+                        {setDialog(null);
+                        setMode("login");}
+                        }>OK</button>
+                </dialog>
+            )}
+            
             <div className="authHead">
                 <div className="logo">Note Logo</div>
                 <div className="title">
