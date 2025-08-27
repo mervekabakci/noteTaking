@@ -5,6 +5,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children, onLogin }){
     const [loading, setLoading] = useState(false);
     const [dialog, setDialog] = useState(null)
+  
     async function apiRequest(endpoint, body){
         try{
             setLoading(true);

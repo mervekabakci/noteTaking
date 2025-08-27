@@ -44,8 +44,6 @@ export default function AuthBox(){
                         (mode === "forgot") && ('Enter your email below, and we’ll send you a link to reset it.') ||
                         (mode === "reset") && ("Choose a new password to secure your account.")
                     }
-                    
-
                 </div>
             </div>
             <form onSubmit={handleSubmit} autoComplete='off'>
