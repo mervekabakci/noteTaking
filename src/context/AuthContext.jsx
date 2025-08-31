@@ -43,8 +43,9 @@ export function AuthProvider({ children, onLogin }){
         });
 
         if(data.accessToken){
-            onLogin({ email: formObj.email, token:data.accessToken });
-            localStorage.data = JSON.stringify({email:formObj.email, token:data.accessToken})
+            const userData = { email: formObj.email, token:data.accessToken }
+            onLogin(userData);
+            localStorage.setItem("data", JSON.stringify(userData));
             
             console.log(data.accessToken);
 

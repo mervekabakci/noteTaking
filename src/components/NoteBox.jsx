@@ -3,14 +3,20 @@ import NoteContext from "../context/NoteContext";
 
 export default function NoteBox(){
     const { user } = useContext(NoteContext);
-    const [notes, setNotes] = useState([]);
-    const [notesId, setNotesId] = useState([]);
+    const [notes, setNotes] = useState(() => {
+        const stored = localStorage.getItem("notes");
+        return stored ? JSON.parse(stored) : [];
+    });
+    const [notesId, setNotesId] = useState(() => {
+        const stored = localStorage.getItem("notesId");
+        return stored ? JSON.parse(stored) : [];
+    });
 
     async function handleSubmit(e){
         e.preventDefault();
 
-        if(!user){
-            console.error("User not logged in");
+        if(!user || !user.token){
+            console.error("No valid token, please login again");
             return;
         }
 
@@ -30,6 +36,14 @@ export default function NoteBox(){
                     tags:formObj.tags ? formObj.tags.split(",") : [],
                 })
             });
+
+            if(res.status === 401){
+                console.warn("Tokan expired or invalid. Loggin out...");
+                localStorage.removeItem("data");
+                window.location.reload();
+                return;
+            }
+
             if(!res.ok){
                 const text = await res.text();
                 throw new Error(`HTTP ${res.status} - ${text}`);
@@ -38,8 +52,16 @@ export default function NoteBox(){
             const data = await res.json();
             console.log("added note: ", data);
 
-            setNotes(prev => [...prev, data]);
-            setNotesId(prev => [...prev, data.id]);
+            setNotes(prev => {
+                const updated = [...prev, data];
+                localStorage.setItem("notes", JSON.stringify(updated));
+                return updated;
+            });
+            setNotesId(prev => {
+                const updatedIds = [...prev, data.id];
+                localStorage.setItem("notesId", JSON.stringify(updatedIds));
+                return updatedIds;
+            });
 
             e.target.reset();
 
@@ -50,7 +72,7 @@ export default function NoteBox(){
 
 
     async function getnoteApi(){
-        if(!user || notesId.length === 0) return;
+        if(!user?.token || notesId.length === 0) return;
 
         const fetchNotes = [];
         for (const id of notesId){
@@ -78,9 +100,12 @@ export default function NoteBox(){
     }
 
     useEffect(() => {
-        getnoteApi();
+        if(user?.token && notesId.length > 0){
+            getnoteApi();
+        }
     },[user, notesId]);
 
+        
     function handleClick(){
         console.log("tıkladım")
     }

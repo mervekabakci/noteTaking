@@ -12,7 +12,7 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() =>{
-    const stored = JSON.parse(localStorage.data || '{}');
+    const stored = JSON.parse(localStorage.getItem("data") || '{}');
     if(stored.email && stored.token){
       setLoggedIn(true);
       // setEmail(stored.email);
