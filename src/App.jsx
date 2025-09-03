@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import AuthBox from './components/AuthBox';
 import { NoteProvider } from './context/NoteContext';
 import NoteBox from './components/NoteBox';
+import AuthRefresh from './components/AuthRefresh';
 
 
 export default function App() {
@@ -26,11 +27,18 @@ export default function App() {
     // setEmail(user.email);
     setUser(user)
   }
+
+  function handleLogout(){
+    localStorage.removeItem("data");
+    setUser(null);
+    setLoggedIn(false);
+  }
   return (
     <>
       {isLoggedIn ? (
         <div>Login successful : {user.email}
-         <NoteProvider user={user}>
+          <AuthRefresh setUser={setUser} logout={handleLogout} />
+          <NoteProvider user={user}>
             <NoteBox />
           </NoteProvider>
       </div>

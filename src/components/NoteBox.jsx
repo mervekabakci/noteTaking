@@ -3,14 +3,7 @@ import NoteContext from "../context/NoteContext";
 
 export default function NoteBox(){
     const { user } = useContext(NoteContext);
-    const [notes, setNotes] = useState(() => {
-        const stored = localStorage.getItem("notes");
-        return stored ? JSON.parse(stored) : [];
-    });
-    const [notesId, setNotesId] = useState(() => {
-        const stored = localStorage.getItem("notesId");
-        return stored ? JSON.parse(stored) : [];
-    });
+    const [notes, setNotes] = useState([]);
 
     async function handleSubmit(e){
         e.preventDefault();
@@ -52,16 +45,16 @@ export default function NoteBox(){
             const data = await res.json();
             console.log("added note: ", data);
 
-            setNotes(prev => {
-                const updated = [...prev, data];
-                localStorage.setItem("notes", JSON.stringify(updated));
-                return updated;
-            });
-            setNotesId(prev => {
-                const updatedIds = [...prev, data.id];
-                localStorage.setItem("notesId", JSON.stringify(updatedIds));
-                return updatedIds;
-            });
+            // setNotes(prev => {
+            //     const updated = [...prev, data];
+            //     localStorage.setItem("notes", JSON.stringify(updated));
+            //     return updated;
+            // });
+            // setNotesId(prev => {
+            //     const updatedIds = [...prev, data.id];
+            //     localStorage.setItem("notesId", JSON.stringify(updatedIds));
+            //     return updatedIds;
+            // });
 
             e.target.reset();
 
@@ -72,9 +65,10 @@ export default function NoteBox(){
 
 
     async function getnoteApi(){
-        if(!user?.token || notesId.length === 0) return;
+        // if(!user?.token || notesId.length === 0) return;
+        if(!user?.token) return;
 
-        const fetchNotes = [];
+        // const fetchNotes = [];
         for (const id of notesId){
             try{
                 const res = await fetch(`https://notes.muratakdemir.tr/Note/${id}`,{
@@ -92,18 +86,20 @@ export default function NoteBox(){
                 }
                 const data = await res.json();
                 fetchNotes.push(data);
+                console.log("all notes :", data)
             }catch(err){
                 console.error(`Error fetch note ${id}: `, err)
             }
         }
-        setNotes(fetchNotes);
+        // setNotes(fetchNotes);
     }
 
     useEffect(() => {
-        if(user?.token && notesId.length > 0){
+        if(user?.token){
+        // if(user?.token && notesId.length > 0){
             getnoteApi();
         }
-    },[user, notesId]);
+    },[user?.token]);
 
         
     function handleClick(){
